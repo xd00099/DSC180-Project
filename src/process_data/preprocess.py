@@ -8,6 +8,7 @@ from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.stem.porter import *
 import pickle
 import nltk
+nltk.download('wordnet')
 
 YEAR_THRESHOLD = 2015
 
