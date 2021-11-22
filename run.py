@@ -3,7 +3,7 @@
 import sys
 import json
 
-sys.path.insert(0, 'src/data')
+sys.path.insert(0, 'src/process_data')
 sys.path.insert(0, 'src/analysis')
 sys.path.insert(0, 'src/model')
 
@@ -48,7 +48,7 @@ def main(targets):
         with open('config/test-model-params.json') as fh:
             model_cfg = json.load(fh)
         save_lda_model(**model_cfg)
-        
+
     return
 
 
