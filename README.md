@@ -1,9 +1,10 @@
-# Generic Simple Project Template
+# Faculty Retrieval Information System
 
-This repository contains skeleton code for a generic project.
+This repository contains project code for experimenting with LDA for Faculty Information Retrieval System.
 
-This code does not run, as the functions are not implemented. There
-should be enough detail to illustrate how the components of the
-project are strung together.
+## Running the Project
+* To get the preprocessed data file, run `python run.py process_data`
+* To get the fitted sklearn.lda model, run `python run.py model`
+* To test the pipline, run `python run.py test`
 
 
