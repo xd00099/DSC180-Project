@@ -8,8 +8,8 @@ sys.path.insert(0, 'src/analysis')
 sys.path.insert(0, 'src/model')
 
 from etl import get_data
-from analysis import compute_aggregates
-from model import train
+from preprocess import save_cleaned_corpus
+from lda import save_lda_model
 
 
 def main(targets):
@@ -20,32 +20,40 @@ def main(targets):
     `main` runs the targets in order of data=>analysis=>model.
     '''
 
-    if 'data' in targets:
-        with open('config/data-params.json') as fh:
-            data_cfg = json.load(fh)
+    if 'etl' in targets:
+        with open('config/etl-params.json') as fh:
+            etl_cfg = json.load(fh)
 
         # make the data target
-        data = get_data(**data_cfg)
+        data = get_data(**etl_cfg)
 
-    if 'analysis' in targets:
-        with open('config/analysis-params.json') as fh:
-            analysis_cfg = json.load(fh)
 
-        # make the data target
-        compute_aggregates(data, **analysis_cfg)
+    if 'process_data' in targets:
+        with open('config/process-params.json') as fh:
+            process_cfg = json.load(fh)
+
+        save_cleaned_corpus(**process_cfg)
 
     if 'model' in targets:
         with open('config/model-params.json') as fh:
             model_cfg = json.load(fh)
 
-        # make the data target
-        train(data, **model_cfg)
+        save_lda_model(**model_cfg)
 
+    if 'test' in targets:
+        with open('config/test-process-params.json') as fh:
+            process_cfg = json.load(fh)
+        save_cleaned_corpus(**process_cfg)
+
+        with open('config/test-model-params.json') as fh:
+            model_cfg = json.load(fh)
+        save_lda_model(**model_cfg)
+        
     return
 
 
 if __name__ == '__main__':
     # run via:
-    # python main.py data model
+    # python main.py
     targets = sys.argv[1:]
     main(targets)

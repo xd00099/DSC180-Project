@@ -1,0 +1,5 @@
+{
+    "data_path": "data/test_data/raw/test_data.csv",
+    "output_path_corpus": "data/test_data/output/all_docs_aggby_author_year.pickle",
+    "output_path_authors": "data/test_data/output/all_authors.pickle"
+}
