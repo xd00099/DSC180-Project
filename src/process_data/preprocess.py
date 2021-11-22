@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import re
 import os
 import gensim
 from gensim.utils import simple_preprocess
