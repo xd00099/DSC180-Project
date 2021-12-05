@@ -6,10 +6,13 @@ import json
 sys.path.insert(0, 'src/process_data')
 sys.path.insert(0, 'src/analysis')
 sys.path.insert(0, 'src/model')
+sys.path.insert(0, 'src/sankey_dash')
 
 from etl import get_data
 from preprocess import save_cleaned_corpus
 from lda import save_lda_model
+from prepare_dash import prepare_sankey
+from launch_dash import run_dash_board
 
 
 def main(targets):
@@ -39,6 +42,14 @@ def main(targets):
             model_cfg = json.load(fh)
 
         save_lda_model(**model_cfg)
+
+    if 'prepare_sankey' in targets:
+        with open('config/model-params.json') as fh:
+            model_cfg = json.load(fh)
+        prepare_sankey(model_cfg['corpus_path'], model_cfg['authors_path'])
+
+    if 'run_dashboard' in targets:
+        run_dash_board()
 
     if 'test' in targets:
         with open('config/test-process-params.json') as fh:

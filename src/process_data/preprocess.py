@@ -24,7 +24,7 @@ def preprocess_abstract(text):
     return " ".join(result)
 
 
-def clean(data_path):
+def get_cleaned_doc_author_info(data_path):
     data = pd.read_csv(data_path, index_col=0)
     data = data.fillna('')
 
@@ -52,13 +52,19 @@ def clean(data_path):
         authors[row['HDSI_author']][row['year']].append(row['abstract_processed'])
 
     all_docs = []
+    missing_author_years = {author : list() for author in data['HDSI_author'].unique()}
     for author, author_dict in authors.items():
         for year, documents in author_dict.items():
+            if len(documents) == 0:
+                missing_author_years[author].append(year)
+                continue
             all_docs.append(" ".join(documents))
 
-    return all_docs, authors
+    return all_docs, authors, missing_author_years, data
 
-def save_cleaned_corpus(data_path, output_path_corpus, output_path_authors):
-    corpus, authors = clean(data_path)
+def save_cleaned_corpus(data_path, output_path_corpus, output_path_authors, output_path_missing_author_years, output_processed_data_path):
+    corpus, authors, missing_author_years, processed_data = get_cleaned_doc_author_info(data_path)
     pickle.dump(corpus, open(output_path_corpus, 'wb'))
     pickle.dump(authors, open(output_path_authors, 'wb'))
+    pickle.dump(missing_author_years, open(output_path_missing_author_years, 'wb'))
+    processed_data.to_csv(output_processed_data_path)

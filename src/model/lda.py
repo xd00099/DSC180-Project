@@ -63,6 +63,32 @@ def train_lda_model(corpus_path, authors_path, k):
 
     return model_lda, df_document_topic, time_author_topic, author_topic
 
+def train_lda_5k_dash(corpus_path, authors_path):
+
+    with open(corpus_path, 'rb') as fp:
+        all_docs = pickle.load(fp)
+
+    with open(authors_path, 'rb') as fp:
+        authors = pickle.load(fp)
+
+    # initate LDA model
+    countVec = CountVectorizer()
+    counts = countVec.fit_transform(all_docs)
+    names = countVec.get_feature_names()
+
+    dict_models = {}
+    dict_results = {}
+    for k in [10, 20, 30, 40, 50]:
+        # k topics model 
+        lda = LatentDirichletAllocation(n_components=k, n_jobs=-1, random_state=123)
+        model_lda = lda.fit_transform(counts)
+        dict_models[str(k)] = lda
+        dict_results[str(k)] = model_lda
+
+    pickle.dump(dict_models, open('data/saved_results/model/k_10_20_30_40_50_models.pickle', 'wb'))
+    pickle.dump(dict_results, open('data/saved_results/model/k_10_20_30_40_50_results.pickle', 'wb'))
+
+    return dict_models, dict_results
 
 def save_lda_model(corpus_path, authors_path, k, model_output_path, dominant_topic_output, time_author_topic_output, author_topic_output):
     model_lda, df_document_topic, time_author_topic, author_topic = train_lda_model(corpus_path, authors_path, k)
