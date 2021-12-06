@@ -1,0 +1,5 @@
+{
+    "corpus_path": "data/output/all_docs_aggby_author_year.pickle",
+    "authors_path": "data/output/all_authors.pickle",
+    "num_topics_list": [5,10,15,20,30]
+}

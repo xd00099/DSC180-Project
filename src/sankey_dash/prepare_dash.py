@@ -13,16 +13,16 @@ import pandas as pd
 import numpy as np
 
 
-def prepare_sankey(corpus_path, author_path):
+def prepare_sankey(corpus_path, authors_path, num_topics_list = [5,10,15,20,30]):
     # run 5k models
-    #models, results = train_lda_5k_dash(corpus_path, author_path)
-    models = pickle.load(open('data/saved_results/model/k_10_20_30_40_50_models.pickle', 'rb'))
-    results = pickle.load(open('data/saved_results/model/k_10_20_30_40_50_results.pickle', 'rb'))
+    #models, results = train_lda_5k_dash(corpus_path, author_path, num_topics_list)
+    models = pickle.load(open('data/saved_results/model/k_5_10_15_20_30_models.pickle', 'rb'))
+    results = pickle.load(open('data/saved_results/model/k_5_10_15_20_30_results.pickle', 'rb'))
     data = pd.read_csv('data/output/processed_data.csv')
     data = data.fillna('')
 
-    all_docs = pickle.load(open('data/output/all_docs_aggby_author_year.pickle', 'rb'))
-    authors = pickle.load(open('data/output/all_authors.pickle', 'rb'))
+    all_docs = pickle.load(open(corpus_path, 'rb'))
+    authors = pickle.load(open(authors_path, 'rb'))
     missing_author_years = pickle.load(open('data/output/missing_author_years.pickle', 'rb'))
 
     countVec = CountVectorizer()
@@ -30,7 +30,7 @@ def prepare_sankey(corpus_path, author_path):
     names = countVec.get_feature_names()
 
     topicnames = {
-        num_topics : ["Topic" + str(i) for i in range(num_topics)] for num_topics in range(10, 60, 10)
+        num_topics : ["Topic" + str(i) for i in range(num_topics)] for num_topics in num_topics_list
     }
 
     # index names
@@ -38,12 +38,12 @@ def prepare_sankey(corpus_path, author_path):
 
     # Make the pandas dataframe
     df_document_topic = {
-        num_topics : pd.DataFrame(results[f'{num_topics}'], columns=topicnames[num_topics], index=docnames) for num_topics in range(10, 60, 10)
+        num_topics : pd.DataFrame(results[f'{num_topics}'], columns=topicnames[num_topics], index=docnames) for num_topics in num_topics_list
     }
 
     # Get dominant topic for each document
     dominant_topic = {
-        num_topics : np.argmax(df_document_topic[num_topics].values, axis=1) for num_topics in range(10, 60, 10)
+        num_topics : np.argmax(df_document_topic[num_topics].values, axis=1) for num_topics in num_topics_list
     }
 
     for num_topics, df in df_document_topic.items():
@@ -70,7 +70,7 @@ def prepare_sankey(corpus_path, author_path):
     }
 
     labels = {}
-    for num_topics in range(10, 60, 10):
+    for num_topics in num_topics_list:
         labels[num_topics] = filtered[.1][num_topics].index.to_list()
         labels[num_topics].extend(filtered[.1][num_topics].columns.to_list())
 
@@ -80,7 +80,7 @@ def prepare_sankey(corpus_path, author_path):
     values = {threshold : {} for threshold in [.1]}
 
     for threshold in [.1]:
-        for num_topics in range(10, 60, 10):
+        for num_topics in num_topics_list:
             curr_sources = []
             curr_targets = []
             curr_values = []
@@ -112,7 +112,7 @@ def prepare_sankey(corpus_path, author_path):
     final_values = {threshold : {} for threshold in [.1]}
 
     for threshold in [.1]:
-        for num_topics in range(10, 60, 10):
+        for num_topics in num_topics_list:
             curr_values_array = np.array(values[threshold][num_topics])
             final_values[threshold][num_topics] = split_into_ranks(curr_values_array)
 
@@ -123,7 +123,7 @@ def prepare_sankey(corpus_path, author_path):
         return topic_list
 
     link_labels = {}
-    for num_topics in range(10, 60, 10):
+    for num_topics in num_topics_list:
         link_labels[num_topics] = labels[num_topics].copy()
         link_labels[num_topics][50:] = display_topics_list(models[f'{num_topics}'], names, 10)
 
@@ -150,9 +150,10 @@ def prepare_sankey(corpus_path, author_path):
             
             #alpha weight parameter for weighting importance of citations vs topic relation
             alpha = .75
-            for topic_num in range((i+1) * 10):
+
+            for topic_num in range(num_topics_list[i]):
                 df[f'{topic_num}_relevance'] = alpha * df[topic_num] + (1-alpha) * df['citations_norm']
-            dataframes[threshold][(i+1) * 10] = df
+            dataframes[threshold][num_topics_list[i]] = df
 
     def create_top_list(data_frame, num_topics, threshold):
         top_5s = []
@@ -165,22 +166,17 @@ def prepare_sankey(corpus_path, author_path):
         return top_5s
 
     tops = {
-        threshold : {num_topics : create_top_list(dataframes[threshold][num_topics], num_topics, threshold) for num_topics in range(10, 60, 10)} for threshold in [.1]
+        threshold : {num_topics : create_top_list(dataframes[threshold][num_topics], num_topics, threshold) for num_topics in num_topics_list} for threshold in [.1]
     }
  
     # sankey diagrams for diff numbers of topics
 
-    heights = {
-    10 : 1000,
-    20 : 1500,
-    30 : 2000,
-    40 : 2500,
-    50 : 3000
-    }
+    heights = dict(zip(num_topics_list, [2000]*5))
+    
 
     figs = {threshold : {} for threshold in [.1]}
     for threshold in [.1]:
-        for num_topics in range(10, 60, 10):
+        for num_topics in num_topics_list:
             fig = go.Figure(data=[go.Sankey(
                 node = dict(
                     pad = 15,
@@ -201,13 +197,7 @@ def prepare_sankey(corpus_path, author_path):
             fig.update_layout(title_text="Author Topic Connections", font=dict(size = 10, color = 'white'), height=heights[num_topics], paper_bgcolor="black", plot_bgcolor='black')
             figs[threshold][num_topics] = fig
 
-    top_words = {
-        10 : display_topics_list(models['10'], names, 10),
-        20 : display_topics_list(models['20'], names, 10),
-        30 : display_topics_list(models['30'], names, 10),
-        40 : display_topics_list(models['40'], names, 10),
-        50 : display_topics_list(models['50'], names, 10)
-    }
+    top_words = dict(zip(num_topics_list, [display_topics_list(models[str(i)], names, 10) for i in num_topics_list]))
 
     locations = {}
     for i, word in enumerate(names):

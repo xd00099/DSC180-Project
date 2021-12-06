@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 import numpy as np
 import sys
+import json
 
 figs = pickle.load(open('data/sankey_dash/figs.pkl', 'rb'))
 tops = pickle.load(open('data/sankey_dash/tops.pkl', 'rb'))
@@ -21,6 +22,8 @@ locations = pickle.load(open('data/sankey_dash/locations.pkl', 'rb'))
 models = pickle.load(open('data/sankey_dash/models.pkl', 'rb'))
 names = pickle.load(open('data/sankey_dash/names.pkl', 'rb'))
 
+num_topics_list = json.load(open('config/sankey-params.json', 'r'))['num_topics_list']
+
 from itertools import chain
 threshold = .1
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
@@ -30,7 +33,7 @@ app.layout = html.Div([
       dcc.Dropdown(
         id='graph-dropdown',
         placeholder='select number of LDA topics',
-        options=[{'label' : f'{i} Topic Model', 'value' : i} for i in range(10, 60, 10)],
+        options=[{'label' : f'{i} Topic Model', 'value' : i} for i in num_topics_list],
         style={
           'color' : 'black',
           'background-color' : '#666699',

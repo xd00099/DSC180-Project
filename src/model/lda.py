@@ -63,7 +63,7 @@ def train_lda_model(corpus_path, authors_path, k):
 
     return model_lda, df_document_topic, time_author_topic, author_topic
 
-def train_lda_5k_dash(corpus_path, authors_path):
+def train_lda_5k_dash(corpus_path, authors_path, num_topics):
 
     with open(corpus_path, 'rb') as fp:
         all_docs = pickle.load(fp)
@@ -78,15 +78,16 @@ def train_lda_5k_dash(corpus_path, authors_path):
 
     dict_models = {}
     dict_results = {}
-    for k in [10, 20, 30, 40, 50]:
+    for k in num_topics:
         # k topics model 
         lda = LatentDirichletAllocation(n_components=k, n_jobs=-1, random_state=123)
         model_lda = lda.fit_transform(counts)
         dict_models[str(k)] = lda
         dict_results[str(k)] = model_lda
 
-    pickle.dump(dict_models, open('data/saved_results/model/k_10_20_30_40_50_models.pickle', 'wb'))
-    pickle.dump(dict_results, open('data/saved_results/model/k_10_20_30_40_50_results.pickle', 'wb'))
+    output_name = '_'.join([str(n) for n in num_topics])
+    pickle.dump(dict_models, open('data/saved_results/model/k_{}_models.pickle'.format(output_name), 'wb'))
+    pickle.dump(dict_results, open('data/saved_results/model/k_{}_results.pickle'.format(output_name), 'wb'))
 
     return dict_models, dict_results
 

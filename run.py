@@ -44,9 +44,9 @@ def main(targets):
         save_lda_model(**model_cfg)
 
     if 'prepare_sankey' in targets:
-        with open('config/model-params.json') as fh:
-            model_cfg = json.load(fh)
-        prepare_sankey(model_cfg['corpus_path'], model_cfg['authors_path'])
+        with open('config/sankey-params.json') as fh:
+            sankey_cfg = json.load(fh)
+        prepare_sankey(**sankey_cfg)
 
     if 'run_dashboard' in targets:
         run_dash_board()
