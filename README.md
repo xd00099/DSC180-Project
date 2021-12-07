@@ -9,4 +9,6 @@ This repository contains project code for experimenting with LDA for Faculty Inf
 * To prepare/update the dashboard, run `python run.py prepare_sankey`
 * To run the live dashboard, run `python run.py run_dashboard`
 
-
+## Using the Dashboard
+* When executing `test` or `run_dashboard`, it will launch dash with a locally hosted port.
+* It would require port-forwarding on a remote server.
