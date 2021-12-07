@@ -13,17 +13,17 @@ import pandas as pd
 import numpy as np
 
 
-def prepare_sankey(corpus_path, authors_path, num_topics_list = [5,10,15,20,30]):
+def prepare_sankey(data_processed_path, data_raw_path, missing_author_years_path, corpus_path, authors_path, models_path, results_path, sankey_output_folder, num_topics_list = [5,10,15,20,30]):
     # run 5k models
-    #models, results = train_lda_5k_dash(corpus_path, author_path, num_topics_list)
-    models = pickle.load(open('data/saved_results/model/k_5_10_15_20_30_models.pickle', 'rb'))
-    results = pickle.load(open('data/saved_results/model/k_5_10_15_20_30_results.pickle', 'rb'))
-    data = pd.read_csv('data/output/processed_data.csv')
+    #models, results = train_lda_5k_dash(corpus_path, authors_path, models_path, results_path, num_topics_list)
+    models = pickle.load(open(models_path, 'rb'))
+    results = pickle.load(open(results_path, 'rb'))
+    data = pd.read_csv(data_processed_path)
     data = data.fillna('')
 
     all_docs = pickle.load(open(corpus_path, 'rb'))
     authors = pickle.load(open(authors_path, 'rb'))
-    missing_author_years = pickle.load(open('data/output/missing_author_years.pickle', 'rb'))
+    missing_author_years = pickle.load(open(missing_author_years_path, 'rb'))
 
     countVec = CountVectorizer()
     counts = countVec.fit_transform(all_docs)
@@ -203,18 +203,18 @@ def prepare_sankey(corpus_path, authors_path, num_topics_list = [5,10,15,20,30])
     for i, word in enumerate(names):
         locations[word] = i
 
-    pickle.dump(figs, open('data/sankey_dash/figs.pkl', 'wb'))
-    pickle.dump(tops, open('data/sankey_dash/tops.pkl', 'wb'))
-    pickle.dump(author_list, open('data/sankey_dash/author_list.pkl', 'wb'))
-    pickle.dump(labels, open('data/sankey_dash/labels.pkl', 'wb'))
-    pickle.dump(positions, open('data/sankey_dash/positions.pkl', 'wb'))
-    pickle.dump(sources, open('data/sankey_dash/sources.pkl', 'wb'))
-    pickle.dump(targets, open('data/sankey_dash/targets.pkl', 'wb'))
-    pickle.dump(top_words, open('data/sankey_dash/top_words.pkl', 'wb'))
-    pickle.dump(locations, open('data/sankey_dash/locations.pkl', 'wb'))
-    pickle.dump(models, open('data/sankey_dash/models.pkl', 'wb'))
-    pickle.dump(names, open('data/sankey_dash/names.pkl', 'wb'))
+    pickle.dump(figs, open(sankey_output_folder+'figs.pkl', 'wb'))
+    pickle.dump(tops, open(sankey_output_folder+'tops.pkl', 'wb'))
+    pickle.dump(author_list, open(sankey_output_folder+'author_list.pkl', 'wb'))
+    pickle.dump(labels, open(sankey_output_folder+'labels.pkl', 'wb'))
+    pickle.dump(positions, open(sankey_output_folder+'positions.pkl', 'wb'))
+    pickle.dump(sources, open(sankey_output_folder+'sources.pkl', 'wb'))
+    pickle.dump(targets, open(sankey_output_folder+'targets.pkl', 'wb'))
+    pickle.dump(top_words, open(sankey_output_folder+'top_words.pkl', 'wb'))
+    pickle.dump(locations, open(sankey_output_folder+'locations.pkl', 'wb'))
+    pickle.dump(models, open(sankey_output_folder+'models.pkl', 'wb'))
+    pickle.dump(names, open(sankey_output_folder+'names.pkl', 'wb'))
 
-    combined = pd.read_csv('data/raw/final_hdsi_faculty_updated.csv')
-    pickle.dump(combined, open('data/sankey_dash/combined.pkl', 'wb'))
+    combined = pd.read_csv(data_raw_path)
+    pickle.dump(combined, open(sankey_output_folder+'combined.pkl', 'wb'))
 

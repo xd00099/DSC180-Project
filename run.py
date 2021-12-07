@@ -49,7 +49,7 @@ def main(targets):
         prepare_sankey(**sankey_cfg)
 
     if 'run_dashboard' in targets:
-        run_dash_board()
+        run_dash_board('data/sankey_dash/')
 
     if 'test' in targets:
         with open('config/test-process-params.json') as fh:
@@ -60,6 +60,11 @@ def main(targets):
             model_cfg = json.load(fh)
         save_lda_model(**model_cfg)
 
+        with open('config/test-sankey-params.json') as fh:
+            sankey_cfg = json.load(fh)
+        prepare_sankey(**sankey_cfg)
+
+        run_dash_board('test/testdata/sankey_dash/')
     return
 
 
