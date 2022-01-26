@@ -68,7 +68,7 @@ def prepare_sankey(data_processed_path, data_raw_path, missing_author_years_path
     filtered = {
         threshold : {num_topics : averaged[num_topics].mask(averaged[num_topics] < threshold, other=0) for num_topics in averaged.keys()} for threshold in [.1]
     }
-
+    
     labels = {}
     for num_topics in num_topics_list:
         labels[num_topics] = filtered[.1][num_topics].index.to_list()
@@ -173,7 +173,7 @@ def prepare_sankey(data_processed_path, data_raw_path, missing_author_years_path
 
     heights = dict(zip(num_topics_list, [2000]*5))
     
-
+    
     figs = {threshold : {} for threshold in [.1]}
     for threshold in [.1]:
         for num_topics in num_topics_list:
@@ -202,7 +202,8 @@ def prepare_sankey(data_processed_path, data_raw_path, missing_author_years_path
     locations = {}
     for i, word in enumerate(names):
         locations[word] = i
-
+    
+    
     pickle.dump(figs, open(sankey_output_folder+'figs.pkl', 'wb'))
     pickle.dump(tops, open(sankey_output_folder+'tops.pkl', 'wb'))
     pickle.dump(author_list, open(sankey_output_folder+'author_list.pkl', 'wb'))
